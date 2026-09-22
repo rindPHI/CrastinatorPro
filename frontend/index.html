@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Crastinator Pro</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <h1>Crastinator Pro</h1>
+    <p class="slogan">Later is greater.</p>
+  </header>
+
+  <main>
+    <section class="panel" id="new-task-panel">
+      <h2>Neuen Task anlegen</h2>
+      <form id="new-task-form">
+        <label>Titel *
+          <input type="text" id="task-title" required />
+        </label>
+        <label>Beschreibung
+          <input type="text" id="task-description" />
+        </label>
+        <label>Fällig am
+          <input type="date" id="task-due-date" />
+        </label>
+        <label>Zugewiesen an
+          <select id="task-assignee">
+            <option value="">— niemand —</option>
+          </select>
+        </label>
+        <label>Priorität
+          <select id="task-priority">
+            <option value="low">niedrig</option>
+            <option value="medium" selected>mittel</option>
+            <option value="high">hoch</option>
+          </select>
+        </label>
+        <button type="submit">Task anlegen</button>
+      </form>
+      <p class="error" id="new-task-error"></p>
+    </section>
+
+    <section class="panel" id="ai-create-panel">
+      <h2>KI-gestützt anlegen</h2>
+      <form id="ai-create-form">
+        <label>Freitext (z. B. "Dringend: Folien für Alice morgen fertigstellen")
+          <input type="text" id="ai-create-text" required />
+        </label>
+        <button type="submit">Aus Text anlegen</button>
+      </form>
+      <p class="error" id="ai-create-error"></p>
+    </section>
+
+    <section class="panel" id="filters-panel">
+      <h2>Taskliste</h2>
+      <div class="filters">
+        <label>Sortieren nach
+          <select id="sort-by">
+            <option value="">— keine —</option>
+            <option value="dueDate">Fälligkeitsdatum</option>
+            <option value="title">Titel</option>
+            <option value="priority">Priorität</option>
+            <option value="completed">Erledigt</option>
+          </select>
+        </label>
+        <label>Reihenfolge
+          <select id="sort-order">
+            <option value="asc">aufsteigend</option>
+            <option value="desc">absteigend</option>
+          </select>
+        </label>
+        <label>Zugewiesen an
+          <select id="filter-assignee">
+            <option value="">— alle —</option>
+          </select>
+        </label>
+        <label>Status
+          <select id="filter-completed">
+            <option value="">— alle —</option>
+            <option value="false">offen</option>
+            <option value="true">erledigt</option>
+          </select>
+        </label>
+        <label class="checkbox-label">
+          <input type="checkbox" id="auto-plus10-toggle" />
+          Auto-+10 für überfällige Tasks
+        </label>
+        <button id="refresh-button" type="button">Aktualisieren</button>
+      </div>
+      <div class="csv-actions">
+        <a id="export-link" href="/api/tasks/export">CSV exportieren</a>
+        <label class="file-label">
+          CSV importieren
+          <input type="file" id="import-file" accept=".csv" />
+        </label>
+      </div>
+      <p id="import-result"></p>
+      <p class="error" id="task-list-error"></p>
+
+      <table id="task-table">
+        <thead>
+          <tr>
+            <th>Titel</th>
+            <th>Beschreibung</th>
+            <th>Fällig am</th>
+            <th>Priorität</th>
+            <th>Zugewiesen an</th>
+            <th>Status</th>
+            <th>Aktionen</th>
+          </tr>
+        </thead>
+        <tbody id="task-table-body"></tbody>
+      </table>
+    </section>
+
+    <section class="panel" id="ai-ask-panel">
+      <h2>KI-Assistent fragen</h2>
+      <form id="ai-ask-form">
+        <label>User
+          <select id="ask-user"></select>
+        </label>
+        <label>Frage
+          <input type="text" id="ask-question" placeholder="z. B. Wie viele Tasks sind offen?" />
+        </label>
+        <button type="submit">Fragen</button>
+      </form>
+      <p id="ai-answer"></p>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
