@@ -181,6 +181,13 @@ function renderTaskRow(task) {
   title.textContent = task.title;
   main.appendChild(title);
 
+  if (task.description) {
+    const description = document.createElement("p");
+    description.className = "task-description";
+    description.textContent = task.description;
+    main.appendChild(description);
+  }
+
   const meta = document.createElement("div");
   meta.className = "task-meta";
 

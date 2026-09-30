@@ -68,6 +68,15 @@ def serialize_task(task: Task) -> dict:
     }
 
 
+class NoCacheStaticFiles(StaticFiles):
+    """Frontend-Dateien immer revalidieren, damit Änderungen sofort sichtbar sind."""
+
+    def file_response(self, *args, **kwargs):
+        response = super().file_response(*args, **kwargs)
+        response.headers["Cache-Control"] = "no-cache"
+        return response
+
+
 def create_app(service: Optional[TaskService] = None) -> FastAPI:
     app = FastAPI(title="Crastinator Pro API", version="0.1.0")
     task_service = service or TaskService()
@@ -234,7 +243,7 @@ def create_app(service: Optional[TaskService] = None) -> FastAPI:
         return serialize_task(task)
 
     if FRONTEND_DIR.exists():
-        app.mount("/", StaticFiles(directory=str(FRONTEND_DIR), html=True), name="frontend")
+        app.mount("/", NoCacheStaticFiles(directory=str(FRONTEND_DIR), html=True), name="frontend")
 
     return app
 
