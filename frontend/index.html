@@ -4,131 +4,177 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Crastinator Pro</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600&display=swap"
+    rel="stylesheet"
+  />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <header>
-    <h1>Crastinator Pro</h1>
-    <p class="slogan">Later is greater.</p>
-  </header>
-
-  <main>
-    <section class="panel" id="new-task-panel">
-      <h2>Neuen Task anlegen</h2>
-      <form id="new-task-form">
-        <label>Titel *
-          <input type="text" id="task-title" required />
-        </label>
-        <label>Beschreibung
-          <input type="text" id="task-description" />
-        </label>
-        <label>Fällig am
-          <input type="date" id="task-due-date" />
-        </label>
-        <label>Zugewiesen an
-          <select id="task-assignee">
-            <option value="">— niemand —</option>
-          </select>
-        </label>
-        <label>Priorität
-          <select id="task-priority">
-            <option value="low">niedrig</option>
-            <option value="medium" selected>mittel</option>
-            <option value="high">hoch</option>
-          </select>
-        </label>
-        <button type="submit">Task anlegen</button>
-      </form>
-      <p class="error" id="new-task-error"></p>
-    </section>
-
-    <section class="panel" id="ai-create-panel">
-      <h2>KI-gestützt anlegen</h2>
-      <form id="ai-create-form">
-        <label>Freitext (z. B. "Dringend: Folien für Alice morgen fertigstellen")
-          <input type="text" id="ai-create-text" required />
-        </label>
-        <button type="submit">Aus Text anlegen</button>
-      </form>
-      <p class="error" id="ai-create-error"></p>
-    </section>
-
-    <section class="panel" id="filters-panel">
-      <h2>Taskliste</h2>
-      <div class="filters">
-        <label>Sortieren nach
-          <select id="sort-by">
-            <option value="">— keine —</option>
-            <option value="dueDate">Fälligkeitsdatum</option>
-            <option value="title">Titel</option>
-            <option value="priority">Priorität</option>
-            <option value="completed">Erledigt</option>
-          </select>
-        </label>
-        <label>Reihenfolge
-          <select id="sort-order">
-            <option value="asc">aufsteigend</option>
-            <option value="desc">absteigend</option>
-          </select>
-        </label>
-        <label>Zugewiesen an
-          <select id="filter-assignee">
-            <option value="">— alle —</option>
-          </select>
-        </label>
-        <label>Status
-          <select id="filter-completed">
-            <option value="">— alle —</option>
-            <option value="false">offen</option>
-            <option value="true">erledigt</option>
-          </select>
-        </label>
-        <label class="checkbox-label">
-          <input type="checkbox" id="auto-plus10-toggle" />
-          Auto-+10 für überfällige Tasks
-        </label>
-        <button id="refresh-button" type="button">Aktualisieren</button>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <h1>Crastinator Pro</h1>
+        <p class="tagline">Later is greater.</p>
       </div>
-      <div class="csv-actions">
-        <a id="export-link" href="/api/tasks/export">CSV exportieren</a>
-        <label class="file-label">
-          CSV importieren
-          <input type="file" id="import-file" accept=".csv" />
+
+      <section class="side-section">
+        <h2>Status</h2>
+        <div class="segmented" id="status-filter" role="group" aria-label="Status-Filter">
+          <button type="button" class="segmented-option is-active" data-value="open">Offen</button>
+          <button type="button" class="segmented-option" data-value="done">Erledigt</button>
+          <button type="button" class="segmented-option" data-value="all">Alle</button>
+        </div>
+      </section>
+
+      <section class="side-section">
+        <h2>Zugewiesen an</h2>
+        <select id="filter-assignee" class="select-field">
+          <option value="">Alle</option>
+        </select>
+      </section>
+
+      <details class="side-section disclosure">
+        <summary>Sortierung</summary>
+        <div class="disclosure-body">
+          <label class="field-label">
+            Kriterium
+            <select id="sort-by" class="select-field">
+              <option value="">Keine</option>
+              <option value="dueDate">Fälligkeitsdatum</option>
+              <option value="title">Titel</option>
+              <option value="priority">Priorität</option>
+            </select>
+          </label>
+          <label class="field-label">
+            Reihenfolge
+            <select id="sort-order" class="select-field">
+              <option value="asc">Aufsteigend</option>
+              <option value="desc">Absteigend</option>
+            </select>
+          </label>
+        </div>
+      </details>
+
+      <section class="side-section">
+        <label class="switch-row">
+          <span>Auto-+10 für überfällige Tasks</span>
+          <span class="switch">
+            <input type="checkbox" id="auto-plus10-toggle" />
+            <span class="switch-track"><span class="switch-thumb"></span></span>
+          </span>
         </label>
-      </div>
-      <p id="import-result"></p>
+      </section>
+
+      <section class="side-section">
+        <h2>KI-Assistent fragen</h2>
+        <select id="ask-user" class="select-field"></select>
+        <textarea
+          id="ask-question"
+          class="text-field"
+          rows="2"
+          placeholder="z. B. Wie viele Tasks sind offen?"
+        ></textarea>
+        <button type="button" id="ask-button" class="btn btn-quiet">Fragen</button>
+        <p class="side-answer" id="ai-answer"></p>
+      </section>
+
+      <details class="side-section disclosure">
+        <summary>Mehr</summary>
+        <div class="disclosure-body">
+          <a id="export-link" class="link-action" href="/api/tasks/export">CSV exportieren</a>
+          <label class="file-action">
+            CSV importieren
+            <input type="file" id="import-file" accept=".csv" />
+          </label>
+          <p class="side-answer" id="import-result"></p>
+        </div>
+      </details>
+    </aside>
+
+    <main class="main">
+      <header class="main-header">
+        <h2 id="list-heading">Offene Tasks</h2>
+        <p class="list-count" id="list-count"></p>
+      </header>
+
       <p class="error" id="task-list-error"></p>
 
-      <table id="task-table">
-        <thead>
-          <tr>
-            <th>Titel</th>
-            <th>Beschreibung</th>
-            <th>Fällig am</th>
-            <th>Priorität</th>
-            <th>Zugewiesen an</th>
-            <th>Status</th>
-            <th>Aktionen</th>
-          </tr>
-        </thead>
-        <tbody id="task-table-body"></tbody>
-      </table>
-    </section>
+      <ul class="task-list" id="task-list"></ul>
+      <p class="empty-state" id="empty-state" hidden>Keine Tasks in dieser Ansicht.</p>
 
-    <section class="panel" id="ai-ask-panel">
-      <h2>KI-Assistent fragen</h2>
-      <form id="ai-ask-form">
-        <label>User
-          <select id="ask-user"></select>
-        </label>
-        <label>Frage
-          <input type="text" id="ask-question" placeholder="z. B. Wie viele Tasks sind offen?" />
-        </label>
-        <button type="submit">Fragen</button>
+      <div class="add-actions">
+        <button type="button" class="btn btn-add" id="show-add-task">
+          <span class="icon icon-plus"></span>
+          Task hinzufügen
+        </button>
+        <button type="button" class="btn btn-ai" id="show-ai-task">
+          <span class="icon icon-sparkle"></span>
+          Task mit KI erstellen
+        </button>
+      </div>
+
+      <form class="add-panel" id="new-task-form" hidden>
+        <input type="text" id="task-title" class="add-panel-title" placeholder="Titel" required />
+        <div class="add-panel-row">
+          <label class="pill pill-field">
+            <span class="icon icon-calendar"></span>
+            <input type="date" id="task-due-date" />
+          </label>
+          <label class="pill pill-field">
+            <span class="icon icon-flag"></span>
+            <select id="task-priority">
+              <option value="low">Niedrig</option>
+              <option value="medium" selected>Mittel</option>
+              <option value="high">Hoch</option>
+            </select>
+          </label>
+          <label class="pill pill-field">
+            <span class="icon icon-user"></span>
+            <select id="task-assignee">
+              <option value="">Niemand</option>
+            </select>
+          </label>
+        </div>
+        <input
+          type="text"
+          id="task-description"
+          class="add-panel-description"
+          placeholder="Beschreibung (optional)"
+        />
+        <div class="add-panel-actions">
+          <p class="error" id="new-task-error"></p>
+          <button type="button" class="icon-btn icon-btn-cancel" id="cancel-new-task" aria-label="Abbrechen">
+            <span class="icon icon-x"></span>
+          </button>
+          <button type="submit" class="icon-btn icon-btn-submit" aria-label="Task anlegen">
+            <span class="icon icon-arrow-right"></span>
+          </button>
+        </div>
       </form>
-      <p id="ai-answer"></p>
-    </section>
-  </main>
+
+      <form class="add-panel" id="ai-create-form" hidden>
+        <input
+          type="text"
+          id="ai-create-text"
+          class="add-panel-title"
+          placeholder='z. B. „Dringend: Folien für Alice morgen fertigstellen“'
+          required
+        />
+        <div class="add-panel-actions">
+          <p class="error" id="ai-create-error"></p>
+          <button type="button" class="icon-btn icon-btn-cancel" id="cancel-ai-task" aria-label="Abbrechen">
+            <span class="icon icon-x"></span>
+          </button>
+          <button type="submit" class="icon-btn icon-btn-submit icon-btn-ai" aria-label="Task mit KI erstellen">
+            <span class="icon icon-sparkle"></span>
+          </button>
+        </div>
+      </form>
+    </main>
+  </div>
 
   <script src="app.js"></script>
 </body>

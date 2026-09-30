@@ -8,6 +8,7 @@ Beispiel:
 """
 
 from .ai import AIProvider, KeywordAIProvider
+from .client import CrastinatorClient
 from .exceptions import (
     CrastinatorError,
     NoDueDateError,
@@ -21,6 +22,7 @@ from .workdays import add_business_days
 
 __all__ = [
     "TaskService",
+    "CrastinatorClient",
     "Task",
     "User",
     "USERS",

@@ -63,6 +63,23 @@ task = service.create_task(title="Folien vorbereiten", assignee_user_id=1)
 service.plus_10(task.id, reference_time=datetime.now())
 ```
 
+## Laufenden Server aus Python ansprechen (HTTP-Client)
+
+`CrastinatorClient` hat dieselben Methoden wie `TaskService`, arbeitet aber
+gegen einen laufenden Server (z. B. dieselbe Instanz, die du im Browser
+siehst). Rückgabewerte sind `Task`/`User`-Objekte, Fehler dieselben Exceptions.
+
+```python
+from crastinator_pro import CrastinatorClient
+
+client = CrastinatorClient("http://127.0.0.1:8000")
+client.create_task(title="Folien vorbereiten", assignee_user_id=1)
+print(client.list_tasks(completed=False))
+```
+
+`reference_time` ist beim Client optional; ohne Angabe verwendet der Server
+seine eigene Uhrzeit.
+
 ## Beispiel-Requests (curl)
 
 Task anlegen:
