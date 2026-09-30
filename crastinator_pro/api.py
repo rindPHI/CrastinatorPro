@@ -106,6 +106,7 @@ def create_app(service: Optional[TaskService] = None) -> FastAPI:
         order: str = Query("asc"),
         assigneeUserId: Optional[int] = Query(None),
         completed: Optional[bool] = Query(None),
+        q: Optional[str] = Query(None),
         referenceTime: Optional[datetime] = Query(None),
         svc: TaskService = Depends(get_service),
     ):
@@ -123,6 +124,7 @@ def create_app(service: Optional[TaskService] = None) -> FastAPI:
                 order=order,
                 assignee_user_id=assigneeUserId,
                 completed=completed,
+                query=q,
             )
         except ValidationError as exc:
             raise HTTPException(status_code=400, detail=str(exc)) from exc

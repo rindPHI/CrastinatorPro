@@ -78,12 +78,15 @@ class TaskService:
         order: str = "asc",
         assignee_user_id: Optional[int] = None,
         completed: Optional[bool] = None,
+        query: Optional[str] = None,
     ) -> list[Task]:
         if self._auto_plus10_enabled:
             self._apply_auto_plus10(reference_time)
 
         tasks = list(self._tasks.values())
 
+        if query is not None:
+            tasks = self._search_tasks(tasks, query)
         if assignee_user_id is not None:
             tasks = [t for t in tasks if t.assignee_user_id == assignee_user_id]
         if completed is not None:
@@ -138,6 +141,18 @@ class TaskService:
         return self._auto_plus10_enabled
 
     # ------------------------------------------------------------------ Sort
+    @staticmethod
+    def _search_tasks(tasks: list[Task], query: str) -> list[Task]:
+        terms = query.lower().split()
+        if not terms:
+            return tasks
+
+        def matches(task: Task) -> bool:
+            haystacks = (task.title.lower(), (task.description or "").lower())
+            return all(any(term in text for text in haystacks) for term in terms)
+
+        return [t for t in tasks if matches(t)]
+
     @staticmethod
     def _sort_tasks(tasks: list[Task], sort_by: str, order: str) -> list[Task]:
         if sort_by not in SORT_FIELDS:

@@ -133,6 +133,7 @@ class CrastinatorClient:
         order: str = "asc",
         assignee_user_id: Optional[int] = None,
         completed: Optional[bool] = None,
+        query: Optional[str] = None,
     ) -> list[Task]:
         params: dict = {"order": order}
         if reference_time is not None:
@@ -147,6 +148,8 @@ class CrastinatorClient:
             params["assigneeUserId"] = assignee_user_id
         if completed is not None:
             params["completed"] = str(completed).lower()
+        if query is not None:
+            params["q"] = query
         return [_parse_task(t) for t in self._request("GET", "/api/tasks", params=params).json()]
 
     def toggle_task(self, task_id: int) -> Task:

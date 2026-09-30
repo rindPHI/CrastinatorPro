@@ -85,7 +85,9 @@ function buildTaskListQuery() {
   const sortBy = document.getElementById("sort-by").value;
   const order = document.getElementById("sort-order").value;
   const assignee = document.getElementById("filter-assignee").value;
+  const searchQuery = document.getElementById("search-input").value.trim();
 
+  if (searchQuery) params.set("q", searchQuery);
   if (sortBy) params.set("sortBy", sortBy);
   if (order) params.set("order", order);
   if (assignee) params.set("assigneeUserId", assignee);
@@ -245,6 +247,20 @@ function setupStatusFilter() {
   }
 }
 
+function setupSearch() {
+  const input = document.getElementById("search-input");
+  let debounceTimer;
+  input.addEventListener("input", () => {
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(refreshTasks, 250);
+  });
+  document.getElementById("search-form").addEventListener("submit", (event) => {
+    event.preventDefault();
+    clearTimeout(debounceTimer);
+    refreshTasks();
+  });
+}
+
 function setupSidebarControls() {
   for (const id of ["sort-by", "sort-order", "filter-assignee"]) {
     document.getElementById(id).addEventListener("change", refreshTasks);
@@ -360,6 +376,7 @@ async function init() {
   await loadAutoPlus10Setting();
   await refreshTasks();
   setupStatusFilter();
+  setupSearch();
   setupSidebarControls();
   setupAddPanels();
 }

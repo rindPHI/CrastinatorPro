@@ -4,6 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Crastinator Pro</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <meta name="theme-color" content="#e4572e" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
@@ -99,6 +101,18 @@
         <h2 id="list-heading">Offene Tasks</h2>
         <p class="list-count" id="list-count"></p>
       </header>
+
+      <form class="search-bar" id="search-form" role="search">
+        <span class="icon icon-search"></span>
+        <input
+          type="search"
+          id="search-input"
+          class="search-input"
+          placeholder="Tasks durchsuchen (Titel &amp; Beschreibung)"
+          aria-label="Tasks durchsuchen"
+          autocomplete="off"
+        />
+      </form>
 
       <p class="error" id="task-list-error"></p>
 

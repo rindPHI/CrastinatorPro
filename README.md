@@ -80,6 +80,42 @@ print(client.list_tasks(completed=False))
 `reference_time` ist beim Client optional; ohne Angabe verwendet der Server
 seine eigene Uhrzeit.
 
+## Freitextsuche
+
+`GET /api/tasks` (bzw. `TaskService.list_tasks(query=...)`) nimmt einen
+optionalen Suchstring entgegen. Er besteht aus einem oder mehreren, durch
+Leerzeichen getrennten Suchbegriffen. Ein Task ist ein Treffer, wenn **jeder**
+Begriff (case-insensitiv) als Teilstring in `title` **oder** `description`
+vorkommt; die Begriffe dürfen sich auf beide Felder verteilen. Ein leerer oder
+nur aus Leerzeichen bestehender String liefert alle Tasks. Reihenfolge:
+erst Suche, dann Filter (`assigneeUserId`, `completed`), dann Sortierung.
+
+```bash
+curl "http://127.0.0.1:8000/api/tasks?q=folien%20konferenz&completed=false&sortBy=dueDate"
+```
+
+```json
+[
+  {
+    "id": 1,
+    "title": "Folien vorbereiten",
+    "description": "Für die Konferenz",
+    "dueDate": "2026-01-05",
+    "completed": false,
+    "createdAt": "2026-01-02T09:00:00",
+    "assigneeUserId": 1,
+    "priority": "high"
+  }
+]
+```
+
+```python
+service.list_tasks(reference_time=datetime.now(), query="folien konferenz", completed=False)
+client.list_tasks(query="folien konferenz", completed=False)  # CrastinatorClient
+```
+
+Im Frontend filtert das Suchfeld über der Taskliste (Eingabe oder Enter).
+
 ## Beispiel-Requests (curl)
 
 Task anlegen:
