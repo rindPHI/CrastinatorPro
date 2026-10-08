@@ -13,6 +13,9 @@ class Priority(str, Enum):
     MEDIUM = "medium"
     HIGH = "high"
 
+    def __repr__(self) -> str:
+        return f'Priority("{self.value}")'
+
 
 @dataclass(frozen=True)
 class User:
@@ -38,3 +41,8 @@ class Task:
     created_at: datetime = field(default_factory=datetime.now)
     assignee_user_id: Optional[int] = None
     priority: Priority = Priority.MEDIUM
+
+    def __hash__(self) -> int:
+        # Hash nur ueber die (unveraenderliche) id, damit Tasks trotz veraenderlicher
+        # Felder in Sets/Dicts verwendbar sind. Konsistent mit dem feldbasierten __eq__.
+        return hash(self.id)

@@ -1,9 +1,11 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
   <rect width="64" height="64" rx="15" fill="#e4572e"/>
-  <!-- "Echo": der Haken, der auf später verschoben wurde -->
-  <path d="M12 34 L23 45 L40 24" fill="none" stroke="#ffffff" stroke-opacity="0.38"
-        stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
-  <!-- eigentlicher Haken, ein Stück weiter rechts: später ist größer -->
-  <path d="M24 34 L35 45 L54 20" fill="none" stroke="#ffffff"
-        stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+  <g fill="none" stroke="#ffffff" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Liegefläche: Rückenlehne + Sitz, durchhängend -->
+    <path d="M13 15 L28 37 Q33 43 41 40 L53 34" stroke-width="7"/>
+    <!-- hinteres Gestell -->
+    <path d="M22 28 L13 50" stroke-width="5"/>
+    <!-- vorderes Bein -->
+    <path d="M44 38 L51 50" stroke-width="5"/>
+  </g>
 </svg>

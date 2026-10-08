@@ -10,7 +10,6 @@ def test_list_users(client: TestClient):
     names = [u["name"] for u in response.json()]
     assert names == ["Alice", "Bob", "Carol"]
 
-
 def test_create_and_get_task(client: TestClient):
     create_response = client.post("/api/tasks", json={"title": "Neuer Task"})
     assert create_response.status_code == 201

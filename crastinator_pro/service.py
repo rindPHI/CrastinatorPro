@@ -12,7 +12,12 @@ from typing import Optional
 
 from .ai import AIProvider, KeywordAIProvider
 from .csv_io import ImportResult, export_tasks_to_csv, import_tasks_from_csv
-from .exceptions import NoDueDateError, TaskNotFoundError, UserNotFoundError, ValidationError
+from .exceptions import (
+    NoDueDateError,
+    TaskNotFoundError,
+    UserNotFoundError,
+    ValidationError,
+)
 from .models import USERS, Priority, Task, User
 from .workdays import add_business_days
 
@@ -63,6 +68,16 @@ class TaskService:
         self._tasks[task.id] = task
         self._next_id += 1
         return task
+
+    # Ignores the ID of the given task
+    def add_task(self, task: Task) -> Task:
+        return self.create_task(
+            title=task.title,
+            description=task.description,
+            due_date=task.due_date,
+            assignee_user_id=task.assignee_user_id,
+            priority=task.priority,
+        )
 
     def get_task(self, task_id: int) -> Task:
         task = self._tasks.get(task_id)
@@ -171,7 +186,9 @@ class TaskService:
             return with_date + without_date
 
         if sort_by == "priority":
-            return sorted(tasks, key=lambda t: _PRIORITY_RANK[t.priority], reverse=reverse)
+            return sorted(
+                tasks, key=lambda t: _PRIORITY_RANK[t.priority], reverse=reverse
+            )
 
         if sort_by == "completed":
             return sorted(tasks, key=lambda t: t.completed, reverse=reverse)
@@ -194,6 +211,8 @@ class TaskService:
 
     def ai_create_task(self, text: str, reference_time: datetime) -> Task:
         if not text or not text.strip():
-            raise ValidationError("Freitext für die KI-Task-Anlage darf nicht leer sein.")
+            raise ValidationError(
+                "Freitext für die KI-Task-Anlage darf nicht leer sein."
+            )
         parsed = self._ai_provider.parse_task(text, reference_time)
         return self.create_task(**parsed)
