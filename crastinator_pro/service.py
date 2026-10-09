@@ -52,9 +52,6 @@ class TaskService:
         assignee_user_id: Optional[int] = None,
         priority: Priority = Priority.MEDIUM,
     ) -> Task:
-        if "]" in title:
-            raise ValidationError("Task title is invalid")
-
         if not title or not title.strip():
             raise ValidationError("title ist Pflichtfeld und darf nicht leer sein.")
         if assignee_user_id is not None and assignee_user_id not in USERS:
