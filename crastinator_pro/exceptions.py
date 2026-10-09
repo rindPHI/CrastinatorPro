@@ -27,3 +27,7 @@ class NoDueDateError(CrastinatorError):
     def __init__(self, task_id: int):
         super().__init__(f"Task {task_id} hat kein dueDate und kann nicht verschoben werden.")
         self.task_id = task_id
+
+
+class AIProviderError(CrastinatorError):
+    """Der KI-Provider (z. B. ein externes LLM) ist ausgefallen oder lieferte Unbrauchbares."""

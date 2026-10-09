@@ -18,7 +18,9 @@ User: **Alice (1)**, **Bob (2)**, **Carol (3)**.
   - `workdays.py` – Werktags-Arithmetik (Mo–Fr, Feiertage werden ignoriert).
   - `csv_io.py` – CSV-Export/-Import.
   - `ai.py` – austauschbare `AIProvider`-Abstraktion; mitgeliefert ist eine
-    einfache, regelbasierte `KeywordAIProvider`.
+    einfache, regelbasierte `KeywordAIProvider` (Default).
+  - `openai_provider.py` – `OpenAIProvider`: echtes LLM über die OpenAI
+    Responses API (siehe „KI-Assistent mit OpenAI“).
   - `api.py` – FastAPI-Anwendung, ein dünner HTTP-Wrapper um `TaskService`.
 - `frontend/` – statische HTML/JS-Oberfläche, die ausschließlich die REST-API
   konsumiert.
@@ -35,6 +37,41 @@ zu. Das ist Voraussetzung für deterministisches, property-based Testen.
 python3 -m venv .venv
 source .venv/bin/activate   # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
+```
+
+## KI-Assistent mit OpenAI
+
+Standardmäßig nutzt der Server den regelbasierten `KeywordAIProvider`. Für ein
+echtes LLM `.env.example` nach `.env` kopieren und ausfüllen:
+
+```bash
+CRASTINATOR_AI_PROVIDER=openai
+OPENAI_API_KEY=sk-...
+OPENAI_MODEL=gpt-5.4-mini   # optional
+```
+
+Die `.env` wird beim Serverstart geladen (Variablen aus der Shell haben
+Vorrang). Ist `CRASTINATOR_AI_PROVIDER=openai` gesetzt, aber kein Key
+vorhanden, bricht der Start mit einer klaren Meldung ab. Schlägt ein
+OpenAI-Aufruf fehl (Netz, Rate-Limit, ungültiger Key, unbrauchbare Antwort),
+antworten `/api/users/{id}/ask` und `/api/tasks/ai-create` mit **HTTP 502**
+und einer Fehlermeldung (`CrastinatorClient` wirft dann `AIProviderError`).
+Es gibt bewusst keinen stillen Fallback auf den Keyword-Provider.
+
+Die Testsuite verwendet immer den Keyword-Provider bzw. einen Fake-Client und
+braucht keinen Key. Einen optionalen Live-Test gegen OpenAI gibt es mit:
+
+```bash
+CRASTINATOR_LIVE_TESTS=1 OPENAI_API_KEY=sk-... pytest tests/test_openai_provider.py
+```
+
+Als Bibliothek:
+
+```python
+from crastinator_pro import TaskService
+from crastinator_pro.openai_provider import OpenAIProvider
+
+service = TaskService(ai_provider=OpenAIProvider())
 ```
 
 ## Server starten
@@ -188,5 +225,6 @@ curl -X POST http://127.0.0.1:8000/api/tasks/ai-create \
   Feiertage, große Datenmengen). Diese Lücke wird im Talk gezielt durch
   Property-Based und Metamorphic Testing aufgedeckt.
 - Feiertage werden bei der Werktagsberechnung nicht berücksichtigt.
-- Der KI-Assistent ist keyword-/regelbasiert (austauschbare Abstraktion,
-  siehe `crastinator_pro/ai.py`), keine Anbindung an ein echtes LLM.
+- Der KI-Assistent ist standardmäßig keyword-/regelbasiert (austauschbare
+  Abstraktion, siehe `crastinator_pro/ai.py`); optional per OpenAI-LLM, dann
+  sind die Antworten nicht deterministisch.

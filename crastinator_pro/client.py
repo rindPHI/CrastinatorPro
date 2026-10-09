@@ -21,6 +21,7 @@ import httpx
 
 from .csv_io import ImportResult, ImportRowError
 from .exceptions import (
+    AIProviderError,
     CrastinatorError,
     NoDueDateError,
     TaskNotFoundError,
@@ -91,6 +92,8 @@ class CrastinatorClient:
             raise NoDueDateError(_first_int(detail))
         if status in (400, 422):
             raise ValidationError(detail)
+        if status == 502:
+            raise AIProviderError(detail)
         raise CrastinatorError(f"HTTP {status}: {detail}")
 
     # ------------------------------------------------------------ Users

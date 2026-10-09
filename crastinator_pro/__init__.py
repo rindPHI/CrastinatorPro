@@ -7,9 +7,10 @@ Beispiel:
     task = service.create_task(title="Folien fertigstellen")
 """
 
-from .ai import AIProvider, KeywordAIProvider
+from .ai import AIProvider, KeywordAIProvider, provider_from_env
 from .client import CrastinatorClient
 from .exceptions import (
+    AIProviderError,
     CrastinatorError,
     NoDueDateError,
     TaskNotFoundError,
@@ -29,10 +30,12 @@ __all__ = [
     "Priority",
     "AIProvider",
     "KeywordAIProvider",
+    "provider_from_env",
     "add_business_days",
     "CrastinatorError",
     "ValidationError",
     "TaskNotFoundError",
     "UserNotFoundError",
     "NoDueDateError",
+    "AIProviderError",
 ]

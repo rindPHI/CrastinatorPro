@@ -6,13 +6,15 @@ from datetime import date, datetime
 from pathlib import Path
 from typing import Optional
 
+from dotenv import load_dotenv
 from fastapi import Depends, FastAPI, HTTPException, Query, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import PlainTextResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
-from .exceptions import NoDueDateError, TaskNotFoundError, UserNotFoundError, ValidationError
+from .ai import provider_from_env
+from .exceptions import AIProviderError, NoDueDateError, TaskNotFoundError, UserNotFoundError, ValidationError
 from .models import Priority, Task, User
 from .service import TaskService
 
@@ -107,6 +109,8 @@ def create_app(service: Optional[TaskService] = None) -> FastAPI:
             )
         except (ValidationError, UserNotFoundError) as exc:
             raise HTTPException(status_code=400, detail=str(exc)) from exc
+        except AIProviderError as exc:
+            raise HTTPException(status_code=502, detail=str(exc)) from exc
         return serialize_task(task)
 
     @app.get("/api/tasks")
@@ -227,6 +231,8 @@ def create_app(service: Optional[TaskService] = None) -> FastAPI:
             answer = svc.ai_ask(user_id, body.question, reference_time)
         except UserNotFoundError as exc:
             raise HTTPException(status_code=404, detail=str(exc)) from exc
+        except AIProviderError as exc:
+            raise HTTPException(status_code=502, detail=str(exc)) from exc
         return {"answer": answer}
 
     @app.post("/api/tasks/ai-create", status_code=201)
@@ -240,6 +246,8 @@ def create_app(service: Optional[TaskService] = None) -> FastAPI:
             task = svc.ai_create_task(body.text, reference_time)
         except (ValidationError, UserNotFoundError) as exc:
             raise HTTPException(status_code=400, detail=str(exc)) from exc
+        except AIProviderError as exc:
+            raise HTTPException(status_code=502, detail=str(exc)) from exc
         return serialize_task(task)
 
     if FRONTEND_DIR.exists():
@@ -248,4 +256,7 @@ def create_app(service: Optional[TaskService] = None) -> FastAPI:
     return app
 
 
-app = create_app()
+# Für `uvicorn crastinator_pro.api:app`: Konfiguration aus .env / Umgebung,
+# KI-Provider gemäß CRASTINATOR_AI_PROVIDER (Default: keyword).
+load_dotenv()
+app = create_app(TaskService(ai_provider=provider_from_env()))

@@ -2,12 +2,14 @@
 
 `AIProvider` ist bewusst als austauschbare Abstraktion gehalten: die mitgelieferte
 `KeywordAIProvider` ist eine einfache, aber echte regel-/keywordbasierte
-Implementierung. Eine Anbindung an ein echtes LLM könnte dieselbe Schnittstelle
-implementieren, ohne dass der restliche Code angepasst werden müsste.
+Implementierung (Default, deterministisch). `OpenAIProvider`
+(`openai_provider.py`) implementiert dieselbe Schnittstelle mit einem echten LLM.
+Welcher Provider der Server nutzt, entscheidet `provider_from_env()`.
 """
 
 from __future__ import annotations
 
+import os
 import re
 from abc import ABC, abstractmethod
 from datetime import datetime, timedelta
@@ -165,3 +167,21 @@ class KeywordAIProvider(AIProvider):
             "assignee_user_id": assignee_user_id,
             "priority": priority,
         }
+
+
+def provider_from_env() -> AIProvider:
+    """Wählt den Provider anhand von `CRASTINATOR_AI_PROVIDER` (`keyword` | `openai`)."""
+    name = os.environ.get("CRASTINATOR_AI_PROVIDER", "keyword").strip().lower() or "keyword"
+    if name == "keyword":
+        return KeywordAIProvider()
+    if name == "openai":
+        if not os.environ.get("OPENAI_API_KEY"):
+            raise RuntimeError(
+                "CRASTINATOR_AI_PROVIDER=openai erfordert die Umgebungsvariable OPENAI_API_KEY."
+            )
+        from .openai_provider import OpenAIProvider
+
+        return OpenAIProvider()
+    raise RuntimeError(
+        f"Unbekannter CRASTINATOR_AI_PROVIDER '{name}' (erlaubt: keyword, openai)."
+    )
